@@ -70,9 +70,42 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
+        /* Music Control Styles */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #ec4899;
+        }
+        .music-control:hover {
+            transform: scale(1.1);
+        }
+        .music-anim {
+            animation: spin 3s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="text-gray-800 antialiased">
+
+    <!-- Audio Element (Hidden) -->
+    <!-- DİKKAT: 'muzik.mp3' dosyasının index.html ile aynı klasörde olduğundan emin ol -->
+    <audio id="bg-music" loop>
+        <source src="muzik.mp3" type="audio/mpeg">
+        Tarayıcınız ses elementini desteklemiyor.
+    </audio>
+
+    <!-- Music Toggle Button (Fixed Bottom Right) -->
+    <div onclick="toggleMusic()" class="music-control" title="Müziği Aç/Kapat">
+        <i id="music-icon" class="fas fa-music text-pink-500 text-xl w-6 h-6 flex items-center justify-center"></i>
+    </div>
 
     <!-- Hero Section -->
     <header class="relative min-h-screen flex flex-col items-center justify-center text-center p-6 bg-gradient-to-br from-pink-100 via-purple-100 to-indigo-100 overflow-hidden">
@@ -96,7 +129,8 @@
             </div>
             
             <div class="mt-8">
-                <button onclick="launchConfetti()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform hover:scale-105 active:scale-95 flex items-center justify-center mx-auto gap-2">
+                <!-- startCelebration fonksiyonunu ekledik -->
+                <button onclick="startCelebration()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform hover:scale-105 active:scale-95 flex items-center justify-center mx-auto gap-2">
                     <i class="fas fa-gift"></i> Kutlamayı Başlat
                 </button>
             </div>
@@ -287,6 +321,38 @@
     </footer>
 
     <script>
+        // Music Control Functions
+        const music = document.getElementById('bg-music');
+        const musicIcon = document.getElementById('music-icon');
+        let isPlaying = false;
+
+        function startCelebration() {
+            // Konfetileri patlat
+            launchConfetti();
+            
+            // Müziği başlat
+            if (!isPlaying) {
+                toggleMusic();
+            }
+        }
+
+        function toggleMusic() {
+            if (isPlaying) {
+                music.pause();
+                musicIcon.classList.remove('fa-compact-disc', 'music-anim');
+                musicIcon.classList.add('fa-music');
+                isPlaying = false;
+            } else {
+                music.play().then(() => {
+                    musicIcon.classList.remove('fa-music');
+                    musicIcon.classList.add('fa-compact-disc', 'music-anim');
+                    isPlaying = true;
+                }).catch(error => {
+                    console.log("Ses çalma hatası (Tarayıcı engeli olabilir):", error);
+                });
+            }
+        }
+
         // Confetti function
         function launchConfetti() {
             var duration = 3 * 1000;
